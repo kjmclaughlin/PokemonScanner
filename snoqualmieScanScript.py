@@ -67,11 +67,10 @@ def main():
                 msg['Subject'] = "PokemonGo Rare Pokemon Update"
                 msg['From'] = fromAddress
                 s = None
+                s = smtplib.SMTP('localhost')
                 for addr in emailList:
                         msg['To'] = addr
-                        s = smtplib.SMTP('localhost')
                         s.sendmail(fromAddress, addr, msg.as_string())
-                if s is not None:
-                        s.quit()
+                s.quit()
 
 main()

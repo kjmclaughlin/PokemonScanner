@@ -2,6 +2,14 @@ import requests, json, random, sys, smtplib, time
 
 from email.mime.text import MIMEText
 
+def generateEmailList(emailFile):
+    emailFile = open(emailFile, "r")
+    emails = emailFile.readlines()
+    output = []
+    for email in emails:
+        output.append(email.strip())
+    return output
+
 topLeftLat = 34.27955979011779
 topLeftLong = -118.6035919189453
 bottomRightLat = 34.220177258268414
@@ -11,8 +19,8 @@ pokemonIds = []
 pokemonFound = {}
 idToPokemonDictionary = {} #This dictionary keys from id number to name for converting input lists
 pokemonToIdDictionary = {} #This dictionary keys from name to id number for converting input lists
-emailList = ["sarahgarcia0101@gmail.com"]
-fromAddress = "CaliforniaPokemon@kevinmclaughlin.me"
+emailList = generateEmailList("CaliforniaEmailList.txt")
+fromAddress = "PokemonGoEmailer@gmail.com"
 messageBody = ""
 pokemonFile = open("pokemonList.txt", "r")
 desiredPokemonFile = open("desiredPokemon.txt", "r")
@@ -62,16 +70,20 @@ def main():
                                 "\n"
 
         print messageBody
+        password = open("GmailLogin.txt", "r").readlines()[0].strip()
+        smtpStr = 'smtp.gmail.com'
+        smtpPort = 587
         if messageBody is not "":
                 msg = MIMEText(messageBody)
                 msg['Subject'] = "PokemonGo Rare Pokemon Update"
                 msg['From'] = fromAddress
-                s = None
+                smtp_serv = smtplib.SMTP(smtpStr, smtpPort)
+                smtp_serv.ehlo_or_helo_if_needed()
+                smtp_serv.starttls()
+                smtp_serv.ehlo()
+                smtp_serv.login(fromAddress, password)
                 for addr in emailList:
                         msg['To'] = addr
-                        s = smtplib.SMTP('localhost')
-                        s.sendmail(fromAddress, addr, msg.as_string())
-                if s is not None:
-                        s.quit()
-
+                        smtp_serv.sendmail(fromAddress, addr, msg.as_string())
+                smtp_serv.quit()
 main()

@@ -2,6 +2,14 @@ import requests, json, random, sys, smtplib, time
 
 from email.mime.text import MIMEText
 
+def generateEmailList(emailFile):
+    emailFile = open(emailFile, "r")
+    emails = emailFile.readlines()
+    output = []
+    for email in emails:
+        output.append(email.strip())
+    return output
+
 topLeftLat = 47.661514380349324
 topLeftLong = -122.31486797332762
 bottomRightLat = 47.65261122687922
@@ -11,8 +19,8 @@ pokemonIds = []
 pokemonFound = {}
 idToPokemonDictionary = {} #This dictionary keys from id number to name for converting input lists
 pokemonToIdDictionary = {} #This dictionary keys from name to id number for converting input lists
-emailList = ["kevinjm7777@gmail.com", "riley.dirks@outlook.com"]
-fromAddress = "UWPokemon@kevinmclaughlin.me"
+emailList = generateEmailList("UWEmailList.txt")
+fromAddress = "pokemongoemailer@gmail.com"
 messageBody = ""
 pokemonFile = open("pokemonList.txt", "r")
 desiredPokemonFile = open("desiredPokemon.txt", "r")
@@ -62,16 +70,21 @@ def main():
                                 "\n"
 
         print messageBody
+        password = open("GmailLogin.txt", "r").readlines()[0].strip()
+        smtpStr = 'smtp.gmail.com'
+        smtpPort = 587
         if messageBody is not "":
                 msg = MIMEText(messageBody)
                 msg['Subject'] = "PokemonGo Rare Pokemon Update"
                 msg['From'] = fromAddress
-                s = None
-                s = smtplib.SMTP('localhost')
-                for addr in emailList:
+                smtp_serv = smtplib.SMTP(smtpStr, smtpPort)
+                smtp_serv.ehlo_or_helo_if_needed()
+                smtp_serv.starttls()
+                smtp_serv.ehlo()
+                smtp_serv.login(fromAddress, password)
+                for addr in emailList:                  
                         msg['To'] = addr
-                        s = smtplib.SMTP('localhost')
-                        s.sendmail(fromAddress, addr, msg.as_string())
-                s.quit()
+                        smtp_serv.sendmail(fromAddress, addr, msg.as_string())
+                smtp_serv.quit()
 
 main()

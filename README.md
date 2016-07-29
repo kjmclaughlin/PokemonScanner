@@ -1,6 +1,6 @@
 # PokemonScanner
 
-Pokemon Scanner is an application that scans the coordinates determined in the scan script itself for pokemon entered in desiredPokemon.txt and then sends email notifications to the people listed in the passed in emaillist with a link to the given pokemon's location in google maps.  This allows the user to quickly locate pokemon in their area which they actually carry about ( not Zubats ).  
+Pokemon Scanner is an application that scans the coordinates determined in the scan script itself for pokemon entered in desiredPokemon.txt and then sends email notifications to the people listed in the passed in emaillist with a link to the given pokemon's location in google maps.  This allows the user to quickly locate pokemon in their area which they actually care about ( not Zubats ).  
 
 This application uses the data API of pokevision.com so credit to them for giving access to pokemon in a location so conveniently.  
 

@@ -33,7 +33,7 @@ for pk in desiredPokemonList:
 	pokemonIds.append(pokemonToIdDictionary[pk.strip()])
 
 def main():
-	log = open("/home/ec2-user/Logs/CaliforniaPokemonLogs", "w+");
+	log = open("/home/ec2-user/Logs/CaliforniaPokemonLogs", "a");
 	sys.stdout = log;
 	x = topLeftLong
 	step = 1.0 / 10.0 #Num scans to cover x and y, total scans is denom^2

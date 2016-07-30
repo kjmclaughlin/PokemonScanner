@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import requests, json, random, sys, smtplib, time
 
 from email.mime.text import MIMEText
@@ -10,20 +11,25 @@ def generateEmailList(emailFile):
         output.append(email.strip())
     return output
 
+latitude = 47.65755439888694
+longitude = -122.31207847595215
+
 topLeftLat = 47.661514380349324
 topLeftLong = -122.31486797332762
 bottomRightLat = 47.65261122687922
 bottomRightLong = -122.30319499969484
 
+path = "/PokemonGO/"
+
 pokemonIds = []
 pokemonFound = {}
 idToPokemonDictionary = {} #This dictionary keys from id number to name for converting input lists
 pokemonToIdDictionary = {} #This dictionary keys from name to id number for converting input lists
-emailList = generateEmailList("UWEmailList.txt")
+emailList = generateEmailList(path + "UWEmailList.txt")
 fromAddress = "pokemongoemailer@gmail.com"
 messageBody = ""
-pokemonFile = open("pokemonList.txt", "r")
-desiredPokemonFile = open("desiredPokemon.txt", "r")
+pokemonFile = open(path + "pokemonList.txt", "r")
+desiredPokemonFile = open(path + "desiredPokemon.txt", "r")
 desiredPokemonList = desiredPokemonFile.readlines()
 fullPokemonList = pokemonFile.readlines()
 for i in range(0, (len(fullPokemonList))):
@@ -33,29 +39,46 @@ for pk in desiredPokemonList:
 	pokemonIds.append(pokemonToIdDictionary[pk.strip()])
 
 def main():
-	log = open("/home/ec2-user/Logs/PokemonLogs", "w+");
+	log = open("/Logs/PokemonLogs", "a");
 	sys.stdout = log;
-	x = topLeftLong
-	step = 1.0 / 10.0 #Num scans to cover x and y, total scans is denom^2
-	dx = (bottomRightLong - topLeftLong) * step
-	dy = (bottomRightLat - topLeftLat) * step
-	while x < bottomRightLong:
-		y = topLeftLat
-		while y > bottomRightLat:
-			url = "https://pokevision.com/map/data/"
-			url += str(y) + '/' + str(x)
-			r = requests.get(url)
-			c = json.loads(r.content)
-			for p in c['pokemon']:
-				if p['pokemonId'] in pokemonIds:
-					lat = str(p['latitude'])
-					lon = str(p['longitude'])
-					if (pokemonFound.has_key(p['pokemonId']) == False):
-						pokemonFound[p['pokemonId']] = p
-					else:
-						pokemonFound[p['pokemonId']] = p
-			y += dy
-		x += dx
+        print("----- Run at " + str(time.localtime()) + " ------")
+	x = longitude
+        y = latitude
+	step = 1.0 / 5.0 #Num scans to cover x and y, total scans is denom^2
+	
+        url = "https://pokevision.com/map/data/"
+        url += str(y) + '/' + str(x)
+        r = requests.get(url)
+        c = json.loads(r.content)
+        for p in c['pokemon']:
+            if p['pokemonId'] in pokemonIds:
+                print "Found Pokemon " + str(p['pokemonId'])
+                lat = str(p['latitude'])
+                lon = str(p['longitude'])
+                if (pokemonFound.has_key(p['pokemonId']) == False):
+                        pokemonFound[p['pokemonId']] = p
+                    
+#        dx = (bottomRightLong - topLeftLong) * step
+#	dy = (bottomRightLat - topLeftLat) * step
+#	while x < bottomRightLong:
+#		y = topLeftLat
+#		while y > bottomRightLat:
+#			url = "https://pokevision.com/map/data/"
+#                        url += str(y) + '/' + str(x)
+#                        print "searching: " + url
+#			r = requests.get(url)
+#			c = json.loads(r.content)
+#			for p in c['pokemon']:
+#				if p['pokemonId'] in pokemonIds:
+#                                        print "Found Pokemon " + str(p['pokemonId'])
+#					lat = str(p['latitude'])
+#					lon = str(p['longitude'])
+#					if (pokemonFound.has_key(p['pokemonId']) == False):
+#						pokemonFound[p['pokemonId']] = p
+#					else:
+#						pokemonFound[p['pokemonId']] = p
+#			y += dy
+#		x += dx
 	print("\n\n\n")
 	print("Pokemon Found:\n")
 	print(pokemonFound)
@@ -70,7 +93,7 @@ def main():
                                 "\n"
 
         print messageBody
-        password = open("GmailLogin.txt", "r").readlines()[0].strip()
+        password = open(path + "GmailLogin.txt", "r").readlines()[0].strip()
         smtpStr = 'smtp.gmail.com'
         smtpPort = 587
         if messageBody is not "":

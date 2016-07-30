@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import requests, json, random, sys, smtplib, time
 
 from email.mime.text import MIMEText
@@ -15,15 +16,17 @@ topLeftLong = -118.6035919189453
 bottomRightLat = 34.220177258268414
 bottomRightLong = -118.52033615112305
 
+path = "/PokemonGO/"
+
 pokemonIds = []
 pokemonFound = {}
 idToPokemonDictionary = {} #This dictionary keys from id number to name for converting input lists
 pokemonToIdDictionary = {} #This dictionary keys from name to id number for converting input lists
-emailList = generateEmailList("CaliforniaEmailList.txt")
+emailList = generateEmailList(path + "CaliforniaEmailList.txt")
 fromAddress = "PokemonGoEmailer@gmail.com"
 messageBody = ""
-pokemonFile = open("pokemonList.txt", "r")
-desiredPokemonFile = open("desiredPokemon.txt", "r")
+pokemonFile = open(path + "pokemonList.txt", "r")
+desiredPokemonFile = open(path + "desiredPokemon.txt", "r")
 desiredPokemonList = desiredPokemonFile.readlines()
 fullPokemonList = pokemonFile.readlines()
 for i in range(0, (len(fullPokemonList))):
@@ -33,7 +36,7 @@ for pk in desiredPokemonList:
 	pokemonIds.append(pokemonToIdDictionary[pk.strip()])
 
 def main():
-	log = open("/home/ec2-user/Logs/CaliforniaPokemonLogs", "a");
+	log = open("/Logs/CaliforniaPokemonLogs", "a");
 	sys.stdout = log;
 	x = topLeftLong
 	step = 1.0 / 10.0 #Num scans to cover x and y, total scans is denom^2
@@ -70,7 +73,7 @@ def main():
                                 "\n"
 
         print messageBody
-        password = open("GmailLogin.txt", "r").readlines()[0].strip()
+        password = open(path + "GmailLogin.txt", "r").readlines()[0].strip()
         smtpStr = 'smtp.gmail.com'
         smtpPort = 587
         if messageBody is not "":
